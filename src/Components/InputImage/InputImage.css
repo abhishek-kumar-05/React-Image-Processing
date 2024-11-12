@@ -1,26 +1,6 @@
-/* .container {
-  background-color: #f1f1f1;
-  border-radius: 20px;
-  padding: 20px;
-  position: relative;
-}
-
-.inputImage {
-  
-  border: dashed 1px black;
-  border-radius: 20px;
-  width: 20rem;
-  height: 20rem;
-  
-  display: flex;
-  justify-content: center;
-  align-items: center;
-} */
-
 .Container {
   border: 2px dashed #ccc;
-  padding: 40px;
-  /* text-align: center; */
+  /* padding: 40px; */
   background-color: #f1f1f1;
   border-radius: 8px;
   max-width: 400px;
@@ -43,11 +23,21 @@
   margin-top: 10px;
 }
 
+.previewHeader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 0px 8px;
+}
+
 .uploadedImage {
-  margin-top: 1rem;
   width: 100%;
   max-width: 300px;
-  border-radius: 8spx;
+  border-radius: 8px;
+  height: 200px;
+  object-fit: contain;
+  margin-top: 3rem;
 }
 
 .cancelButtonContainer {
@@ -59,4 +49,11 @@
   border: none;
   cursor: pointer;
   font-size: 1.1rem;
+}
+.inputImageHolder {
+  width: 100%;
+  max-width: 300px;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
 }

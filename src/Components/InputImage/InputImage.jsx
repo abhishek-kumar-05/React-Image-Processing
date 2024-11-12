@@ -14,7 +14,6 @@ const InputImage = () => {
       setImageSrc(reader.result);
     };
     reader.readAsDataURL(file);
-    console.log(imageAccepted);
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
@@ -41,14 +40,15 @@ const InputImage = () => {
 
       {imageSrc && (
         <div className="inputImageHolder">
-          <div className="cancelButtonContainer">
-            <i
-              onClick={handleCancel}
-              className="fa-solid fa-xmark cancelButton "
-            ></i>
+          <div className="previewHeader">
+            <div className="cancelButtonContainer">
+              <i
+                onClick={handleCancel}
+                className="fa-solid fa-xmark cancelButton "
+              ></i>
+            </div>
+            <p>Preview : </p>
           </div>
-
-          <p>Preview : </p>
           <img
             src={imageSrc}
             alt="Input Image Preview"
