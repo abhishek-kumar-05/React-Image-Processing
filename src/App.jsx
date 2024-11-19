@@ -1,6 +1,6 @@
 // import React from 'react'
 
-import Header from "./Components/Header/header";
+import Header from "./Components/header/Header";
 import InputImage from "./Components/InputImage/InputImage";
 
 const App = () => {
