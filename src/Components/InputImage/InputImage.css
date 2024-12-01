@@ -1,16 +1,17 @@
 .Container {
   border: 2px dashed #ccc;
-  /* padding: 40px; */
+
   background-color: #f1f1f1;
   border-radius: 8px;
   max-width: 400px;
-  height: 20rem;
+  min-height: 20rem;
   margin: auto;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1rem;
 }
 
 .uploadButton {
@@ -24,9 +25,7 @@
 }
 
 .previewHeader {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
   padding: 0px 8px;
 }
@@ -37,7 +36,6 @@
   border-radius: 8px;
   height: 200px;
   object-fit: contain;
-  margin-top: 3rem;
 }
 
 .cancelButtonContainer {
@@ -55,7 +53,15 @@
   max-width: 300px;
   position: relative;
   border-radius: 8px;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 1rem 0rem;
+}
+
+a {
+  text-decoration: none;
 }
 
 .loadingSpinner {
@@ -66,6 +72,9 @@
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: auto;
+  display: flex;
+  justify-items: center;
+  align-items: center;
 }
 
 @keyframes spin {

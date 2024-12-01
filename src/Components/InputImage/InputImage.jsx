@@ -4,7 +4,7 @@ import pica from "pica";
 import "./InputImage.css";
 
 const InputImage = () => {
-  const [imageSrc, setImageSrc] = useState(null);
+  const [imageUpload, setImageUpload] = useState(true);
   const [loading, setLoading] = useState(null);
   const [resizedImage, setResizedImage] = useState(null);
 
@@ -12,13 +12,17 @@ const InputImage = () => {
     const file = imageAccepted[0];
 
     if (file) {
+      if (!file.type.startsWith("image/")) {
+        alert("wrong image format");
+        return;
+      }
+      setImageUpload(false);
       setLoading(true);
 
       const img = new Image();
       const reader = new FileReader();
       reader.onload = (e) => {
         img.src = e.target.result;
-        setImageSrc(e.target.result);
 
         img.onload = () => {
           const canvas = document.createElement("canvas");
@@ -51,31 +55,26 @@ const InputImage = () => {
       };
       reader.readAsDataURL(file);
     }
-
-    // const reader = new FileReader();
-    // reader.onload = () => {
-    //   setImageSrc(reader.result);
-    // };
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: "image/*",
+    accept: null,
     multiple: false,
   });
 
   const handleCancel = () => {
-    setImageSrc(null);
+    setImageUpload(true);
     setResizedImage(null);
     setLoading(false);
   };
 
   return (
     <div {...getRootProps()} className="Container">
-      {!imageSrc && (
+      {imageUpload && (
         <>
           <input {...getInputProps()} />
-          <p>
+          <p aria-live="polite">
             {isDragActive
               ? "Drop the image..."
               : "Drag and drop image or browse to upload"}
@@ -86,13 +85,9 @@ const InputImage = () => {
         </>
       )}
 
-      {loading && (
-        <div className="loadingSpinner">
-          <p>Processing...</p>
-        </div>
-      )}
+      {loading && <div className="loadingSpinner"></div>}
 
-      {imageSrc && (
+      {resizedImage && (
         <div className="inputImageHolder">
           <div className="previewHeader">
             <div className="cancelButtonContainer">
@@ -101,31 +96,20 @@ const InputImage = () => {
                 className="fa-solid fa-xmark cancelButton "
               ></i>
             </div>
-            <p>Preview : </p>
+            <p>Resized Image: </p>
           </div>
           <img
-            src={imageSrc}
-            alt="Input Image Preview"
+            src={resizedImage}
+            alt="Resized Image"
             className="uploadedImage"
           />
-
-          {resizedImage && (
-            <>
-              <p>Resized Image:</p>
-              <img
-                src={resizedImage}
-                alt="Resized Image"
-                className="uploadedImage"
-              />
-              <a
-                href={resizedImage}
-                download="resizedimage.jpg"
-                className="uploadButton"
-              >
-                Download Image
-              </a>
-            </>
-          )}
+          <a
+            href={resizedImage}
+            download="resizedimage.jpeg"
+            className="uploadButton"
+          >
+            Download
+          </a>
         </div>
       )}
     </div>
