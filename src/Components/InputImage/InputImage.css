@@ -85,3 +85,35 @@ a {
     transform: rotate(360deg);
   }
 }
+
+.customSetting {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 300px;
+  margin: 1rem auto;
+}
+
+.customSetting > .fieldGroup {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.customSetting label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.customSetting input[type="number"],
+.customSetting select {
+  width: 50%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.customSetting input[type="range"] {
+  width: 50%;
+}

@@ -8,54 +8,62 @@ const InputImage = () => {
   const [loading, setLoading] = useState(null);
   const [resizedImage, setResizedImage] = useState(null);
 
-  const onDrop = useCallback((imageAccepted) => {
-    const file = imageAccepted[0];
+  const [height, setHeight] = useState(5979);
+  const [width, setWidth] = useState(3986);
+  const [quality, setQuality] = useState(0.8);
+  const [format, setFormat] = useState("image/jpeg");
 
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        alert("wrong image format");
-        return;
-      }
-      setImageUpload(false);
-      setLoading(true);
+  const onDrop = useCallback(
+    (imageAccepted) => {
+      const file = imageAccepted[0];
 
-      const img = new Image();
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        img.src = e.target.result;
+      if (file) {
+        if (!file.type.startsWith("image/")) {
+          alert("wrong image format");
+          return;
+        }
+        setImageUpload(false);
+        setLoading(true);
+        // setFormat(file.type);
 
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const targetWidth = 1200;
-          const aspectRatio = img.height / img.width;
-          canvas.width = targetWidth;
-          canvas.height = targetWidth * aspectRatio;
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          img.src = e.target.result;
+          img.onload = () => {
+            // setHeight(img.height);
+            // setWidth(img.width);
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
 
-          const picaInstance = new pica();
+            const picaInstance = new pica();
 
-          picaInstance
-            .resize(img, canvas, {
-              quality: 3,
-              unsharpAmount: 120,
-              unsharpRadius: 0.8,
-              unsharpThreshold: 5,
-            })
-            .then((result) => picaInstance.toBlob(result, file.type))
-            .then((blob) => {
-              const resizedURL = URL.createObjectURL(blob);
-              setResizedImage(resizedURL);
-              setLoading(false);
-              console.log("successfull");
-            })
-            .catch((error) => {
-              console.error("pica error: ", error);
-              setLoading(false);
-            });
+            picaInstance
+              .resize(img, canvas, {
+                quality: 3,
+                unsharpAmount: 120,
+                unsharpRadius: 0.8,
+                unsharpThreshold: 5,
+              })
+              .then((result) => picaInstance.toBlob(result, format, quality))
+              .then((blob) => {
+                const resizedURL = URL.createObjectURL(blob);
+                setResizedImage(resizedURL);
+                setLoading(false);
+                console.log("successfull");
+              })
+              .catch((error) => {
+                console.error("pica error: ", error);
+                setLoading(false);
+              });
+          };
         };
-      };
-      reader.readAsDataURL(file);
-    }
-  }, []);
+        reader.readAsDataURL(file);
+      }
+    },
+    [height, width, quality, format]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -103,9 +111,65 @@ const InputImage = () => {
             alt="Resized Image"
             className="uploadedImage"
           />
+          <div className="customSetting">
+            <div className="fieldGroup">
+              <label htmlFor="height">Height: </label>
+              <input
+                type="number"
+                name="height"
+                id="height"
+                value={height}
+                onChange={(e) => {
+                  setHeight(e.target.value);
+                }}
+              />
+            </div>
+            <div className="fieldGroup">
+              <label htmlFor="width">Width: </label>
+              <input
+                type="number"
+                name="width"
+                id="width"
+                value={width}
+                onChange={(e) => {
+                  setWidth(e.target.value);
+                }}
+              />
+            </div>
+            <div className="fieldGroup">
+              <label htmlFor="quality">Quality: </label>
+              <input
+                type="range"
+                name="quality"
+                id="quality"
+                min="0.1"
+                max="1"
+                step="0.1"
+                value={quality}
+                onChange={(e) => {
+                  setQuality(parseFloat(e.target.value));
+                }}
+              />
+            </div>
+            <div className="fieldGroup">
+              <label htmlFor="imageFormat">Format: </label>
+              <select
+                name="imageFormat"
+                id="imageFormat"
+                value={format}
+                onChange={(e) => {
+                  setFormat(e.target.value);
+                }}
+              >
+                <option value="image/jpeg">JPEG</option>
+                <option value="image/png">PNG</option>
+                <option value="imagewebp">WEBP</option>
+              </select>
+            </div>
+          </div>
           <a
             href={resizedImage}
-            download="resizedimage.jpeg"
+            download={`Image.${format.split("/")[1]}`}
             className="uploadButton"
           >
             Download
