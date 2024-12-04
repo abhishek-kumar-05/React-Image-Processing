@@ -1,69 +1,100 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import pica from "pica";
 import "./InputImage.css";
+import debounce from "lodash.debounce";
 
 const InputImage = () => {
   const [imageUpload, setImageUpload] = useState(true);
   const [loading, setLoading] = useState(null);
   const [resizedImage, setResizedImage] = useState(null);
+  const [imageSize, setImageSize] = useState(null);
 
   const [height, setHeight] = useState(5979);
   const [width, setWidth] = useState(3986);
-  const [quality, setQuality] = useState(0.8);
+  const [quality, setQuality] = useState(0.5);
   const [format, setFormat] = useState("image/jpeg");
+  const [originalImage, setOriginalImage] = useState(null);
 
-  const onDrop = useCallback(
-    (imageAccepted) => {
-      const file = imageAccepted[0];
+  const onDrop = useCallback((imageAccepted) => {
+    const file = imageAccepted[0];
 
-      if (file) {
-        if (!file.type.startsWith("image/")) {
-          alert("wrong image format");
-          return;
-        }
-        setImageUpload(false);
-        setLoading(true);
-        // setFormat(file.type);
-
-        const img = new Image();
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          img.src = e.target.result;
-          img.onload = () => {
-            // setHeight(img.height);
-            // setWidth(img.width);
-            const canvas = document.createElement("canvas");
-            canvas.width = width;
-            canvas.height = height;
-
-            const picaInstance = new pica();
-
-            picaInstance
-              .resize(img, canvas, {
-                quality: 3,
-                unsharpAmount: 120,
-                unsharpRadius: 0.8,
-                unsharpThreshold: 5,
-              })
-              .then((result) => picaInstance.toBlob(result, format, quality))
-              .then((blob) => {
-                const resizedURL = URL.createObjectURL(blob);
-                setResizedImage(resizedURL);
-                setLoading(false);
-                console.log("successfull");
-              })
-              .catch((error) => {
-                console.error("pica error: ", error);
-                setLoading(false);
-              });
-          };
-        };
-        reader.readAsDataURL(file);
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        alert("wrong image format");
+        return;
       }
+      setImageUpload(false);
+      setLoading(true);
+
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        img.src = e.target.result;
+        img.onload = () => {
+          setHeight(img.height);
+          setWidth(img.width);
+          setOriginalImage(img);
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
+  const compressImage = useCallback(
+    (img) => {
+      if (!img) return;
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+
+      const picaInstance = new pica();
+
+      picaInstance
+        .resize(img, canvas, {
+          quality: 3,
+          unsharpAmount: 120,
+          unsharpRadius: 0.8,
+          unsharpThreshold: 5,
+        })
+        .then((result) => picaInstance.toBlob(result, format, quality))
+        .then((blob) => {
+          const resizedURL = URL.createObjectURL(blob);
+          setResizedImage(resizedURL);
+          setLoading(false);
+
+          let fileSize = blob.size;
+          let formattedSize;
+          if (fileSize < 1024 * 1024) {
+            const fileSizeKB = (fileSize / 1024).toFixed(2);
+            formattedSize = `${fileSizeKB} KB`;
+          } else {
+            const fileSizeMB = (fileSize / (1024 * 1024)).toFixed(2);
+            formattedSize = `${fileSizeMB} MB`;
+          }
+
+          setImageSize(formattedSize);
+
+          console.log("successfull");
+        })
+        .catch((error) => {
+          console.error("pica error: ", error);
+          setLoading(false);
+        });
     },
     [height, width, quality, format]
   );
+
+  useEffect(() => {
+    if (originalImage) {
+      setLoading(true);
+      const debouncedCompress = debounce((image) => compressImage(image), 1000);
+      debouncedCompress(originalImage);
+      return () => {
+        debouncedCompress.cancel();
+      };
+    }
+  }, [originalImage, compressImage]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -72,6 +103,7 @@ const InputImage = () => {
   });
 
   const handleCancel = () => {
+    setOriginalImage(null);
     setImageUpload(true);
     setResizedImage(null);
     setLoading(false);
@@ -163,7 +195,7 @@ const InputImage = () => {
               >
                 <option value="image/jpeg">JPEG</option>
                 <option value="image/png">PNG</option>
-                <option value="imagewebp">WEBP</option>
+                <option value="image/webp">WEBP</option>
               </select>
             </div>
           </div>
@@ -172,7 +204,7 @@ const InputImage = () => {
             download={`Image.${format.split("/")[1]}`}
             className="uploadButton"
           >
-            Download
+            Download ({imageSize})
           </a>
         </div>
       )}
