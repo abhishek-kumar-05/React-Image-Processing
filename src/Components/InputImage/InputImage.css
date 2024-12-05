@@ -108,12 +108,16 @@ a {
 
 .customSetting input[type="number"],
 .customSetting select {
-  width: 50%;
+  width: 60%;
   padding: 5px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+.customSetting .inputRangeHolder {
+  display: flex;
+  width: 60%;
+}
 
 .customSetting input[type="range"] {
-  width: 50%;
+  width: 100%;
 }

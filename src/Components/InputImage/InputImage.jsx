@@ -10,10 +10,11 @@ const InputImage = () => {
   const [resizedImage, setResizedImage] = useState(null);
   const [imageSize, setImageSize] = useState(null);
 
-  const [height, setHeight] = useState(5979);
-  const [width, setWidth] = useState(3986);
+  const [height, setHeight] = useState(null);
+  const [width, setWidth] = useState(null);
   const [quality, setQuality] = useState(0.5);
-  const [format, setFormat] = useState("image/jpeg");
+  const [qualityValue, setQualityValue] = useState(50);
+  const [format, setFormat] = useState(null);
   const [originalImage, setOriginalImage] = useState(null);
 
   const onDrop = useCallback((imageAccepted) => {
@@ -26,6 +27,7 @@ const InputImage = () => {
       }
       setImageUpload(false);
       setLoading(true);
+      setFormat(file.type);
 
       const img = new Image();
       const reader = new FileReader();
@@ -170,18 +172,22 @@ const InputImage = () => {
             </div>
             <div className="fieldGroup">
               <label htmlFor="quality">Quality: </label>
-              <input
-                type="range"
-                name="quality"
-                id="quality"
-                min="0.1"
-                max="1"
-                step="0.1"
-                value={quality}
-                onChange={(e) => {
-                  setQuality(parseFloat(e.target.value));
-                }}
-              />
+              <div className="inputRangeHolder">
+                <input
+                  type="range"
+                  name="quality"
+                  id="quality"
+                  min="0.1"
+                  max="1"
+                  step="0.1"
+                  value={quality}
+                  onChange={(e) => {
+                    setQuality(parseFloat(e.target.value));
+                    setQualityValue(Math.round(e.target.value * 100));
+                  }}
+                />
+                <span>{qualityValue}%</span>
+              </div>
             </div>
             <div className="fieldGroup">
               <label htmlFor="imageFormat">Format: </label>
