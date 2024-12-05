@@ -109,6 +109,8 @@ const InputImage = () => {
     setImageUpload(true);
     setResizedImage(null);
     setLoading(false);
+    setQuality(0.5);
+    setQualityValue(50);
   };
 
   return (
